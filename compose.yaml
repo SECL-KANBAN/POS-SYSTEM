@@ -1,0 +1,6 @@
+services:
+  possystem:
+    image: possystem
+    build:
+      context: .
+      dockerfile: ./Dockerfile
