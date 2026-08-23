@@ -42,11 +42,7 @@
                                         <x-input-error :messages="$errors->get('name')" class="mt-2" />
                                     </div>
 
-                                    <div>
-                                        <x-input-label for="sku" :value="__('SKU')" />
-                                        <x-text-input id="sku" name="sku" type="text" class="mt-1 block w-full" :value="old('sku')" required />
-                                        <x-input-error :messages="$errors->get('sku')" class="mt-2" />
-                                    </div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('SKU will be generated automatically.') }}</p>
 
                                     <div>
                                         <x-input-label for="price" :value="__('Price')" />
@@ -86,23 +82,23 @@
                                     @endif
                                     <div class="min-w-0 flex-1">
                                         <p class="font-medium">{{ $product->name }}</p>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $product->sku }} · ${{ number_format((float) $product->price, 2) }} · {{ $product->stock }} in stock</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $product->sku }} · ₱{{ number_format((float) $product->price, 2) }} · {{ $product->stock }} in stock</p>
                                     </div>
                                     <div class="flex flex-wrap items-center justify-end gap-2">
                                         <span class="text-sm {{ $product->availability ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
                                             {{ $product->availability ? __('Available') : __('Unavailable') }}
                                         </span>
                                         <x-secondary-button class="!h-8 !w-8 !px-0 !py-0 justify-center text-base" type="button" title="{{ __('Edit') }}" aria-label="{{ __('Edit') }}" x-on:click="editProduct = {{ $product->id }}">
-                                            <span aria-hidden="true">&#9998;</span>
+                                            <i class="fi fi-rr-edit" aria-hidden="true"></i>
                                         </x-secondary-button>
                                         <x-secondary-button class="!h-8 !w-8 !px-0 !py-0 justify-center text-base" type="button" title="{{ __('Add to Cart') }}" aria-label="{{ __('Add to Cart') }}">
-                                            <span aria-hidden="true">&#128722;</span>
+                                            <i class="fi fi-rr-shopping-cart-add" aria-hidden="true"></i>
                                         </x-secondary-button>
                                         <form class="shrink-0" method="POST" action="{{ route('products.destroy', $product) }}" onsubmit="return confirm('{{ __('Delete this product?') }}')">
                                             @csrf
                                             @method('DELETE')
                                             <x-danger-button class="!h-8 !w-8 !px-0 !py-0 justify-center text-base" title="{{ __('Delete') }}" aria-label="{{ __('Delete') }}">
-                                                <span aria-hidden="true">&#128465;</span>
+                                                <i class="fi fi-rr-trash" aria-hidden="true"></i>
                                             </x-danger-button>
                                         </form>
                                     </div>
@@ -127,11 +123,6 @@
                                             <div>
                                                 <x-input-label for="edit_name_{{ $product->id }}" :value="__('Name')" />
                                                 <x-text-input id="edit_name_{{ $product->id }}" name="name" type="text" class="mt-1 block w-full" value="{{ $product->name }}" required />
-                                            </div>
-
-                                            <div>
-                                                <x-input-label for="edit_sku_{{ $product->id }}" :value="__('SKU')" />
-                                                <x-text-input id="edit_sku_{{ $product->id }}" name="sku" type="text" class="mt-1 block w-full" value="{{ $product->sku }}" required />
                                             </div>
 
                                             <div>
