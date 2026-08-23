@@ -70,6 +70,7 @@ class ProductController extends Controller
         return Redirect::route('dashboard')->with('status', 'Product deleted successfully.');
     }
 
+
     private function generateSku(Request $request): string
     {
         do {
