@@ -91,9 +91,20 @@
                                         <x-secondary-button class="!h-8 !w-8 !px-0 !py-0 justify-center text-base" type="button" title="{{ __('Edit') }}" aria-label="{{ __('Edit') }}" x-on:click="editProduct = {{ $product->id }}">
                                             <i class="fi fi-rr-edit" aria-hidden="true"></i>
                                         </x-secondary-button>
-                                        <x-secondary-button class="!h-8 !w-8 !px-0 !py-0 justify-center text-base" type="button" title="{{ __('Add to Cart') }}" aria-label="{{ __('Add to Cart') }}">
-                                            <i class="fi fi-rr-shopping-cart-add" aria-hidden="true"></i>
-                                        </x-secondary-button>
+
+                                        <form method="POST" action="{{ route('cart.add', $product) }}">
+                                            @csrf
+
+                                            <x-secondary-button
+                                                class="!h-8 !w-8 !px-0 !py-0 justify-center text-base"
+                                                type="submit"
+                                                title="{{ __('Add to Cart') }}"
+                                                aria-label="{{ __('Add to Cart') }}"
+                                            >
+                                                <i class="fi fi-rr-shopping-cart-add" aria-hidden="true"></i>
+                                            </x-secondary-button>
+                                        </form>
+
                                         <form class="shrink-0" method="POST" action="{{ route('products.destroy', $product) }}" onsubmit="return confirm('{{ __('Delete this product?') }}')">
                                             @csrf
                                             @method('DELETE')
@@ -159,8 +170,134 @@
                 </div>
 
                 <div class="min-w-0 flex-1 overflow-hidden rounded-lg bg-white shadow-sm dark:bg-gray-800">
-                    <div class="p-6 text-gray-900 dark:text-gray-100">
-                        <h2 class="text-xl font-semibold">{{ __('Cart') }}</h2>
+            <div class="p-6 text-gray-900 dark:text-gray-100">
+
+                <h2 class="text-xl font-semibold">{{ __('Cart') }}</h2>
+
+                @php
+                    $cart = session()->get('cart', []);
+                @endphp
+
+                @if(count($cart) > 0)
+
+                    <div class="mt-6 space-y-3">
+
+                        @foreach($cart as $item)
+
+                            <div class="flex items-center gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700">
+
+                                {{-- Product Image --}}
+                                @if(!empty($item['image']))
+                                    <img
+                                        src="{{ \Illuminate\Support\Facades\Storage::url($item['image']) }}"
+                                        alt="{{ $item['name'] }}"
+                                        class="h-12 w-12 rounded object-cover"
+                                    >
+                                @endif
+
+                                {{-- Product Information --}}
+                                <div class="min-w-0 flex-1">
+
+                                    <p class="font-medium">
+                                        {{ $item['name'] }}
+                                    </p>
+
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ $item['sku'] }}
+                            </p>
+
+                            <div class="mt-2 flex items-center gap-2">
+
+                            {{-- Minus Button --}}
+                            <form method="POST" action="{{ route('cart.decrease', $item['id']) }}">
+                                @csrf
+
+                                <button
+                                    type="submit"
+                                    class="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-sm font-semibold hover:bg-gray-100"
+                                >
+                                    −
+                                </button>
+                            </form>
+
+                            {{-- Quantity --}}
+                            <span class="min-w-[25px] text-center font-medium">
+                                {{ $item['quantity'] }}
+                            </span>
+
+                            {{-- Plus Button --}}
+                            <form method="POST" action="{{ route('cart.add', $item['id']) }}">
+                                @csrf
+
+                                <button
+                                    type="submit"
+                                    class="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-sm font-semibold hover:bg-gray-100"
+                                >
+                                    +
+                                </button>
+                            </form>
+
+                        </div>
+
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            ₱{{ number_format($item['price'], 2) }} each
+                        </p>
+
+                        </div>
+
+                        {{-- Item Total --}}
+                        <div class="font-semibold">
+                            ₱{{ number_format($item['price'] * $item['quantity'], 2) }}
+                        </div>
+
+                    </div>
+
+                @endforeach
+
+                                </div>
+
+                                @php
+                                    $total = 0;
+
+                                    foreach($cart as $item) {
+                                        $total += $item['price'] * $item['quantity'];
+                                    }
+                                @endphp
+
+                                <div class="mt-6 border-t border-gray-200 pt-4 dark:border-gray-700">
+
+                                    <div class="flex justify-between text-lg font-semibold">
+
+                                        <span>Total</span>
+
+                                        <span>
+                                            ₱{{ number_format($total, 2) }}
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            @else
+
+                                <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">
+                                    Your cart is empty.
+                                </p>
+
+                            @endif
+                            <div style="margin-top: 20px; text-align: right;">
+                        <a href="{{ route('checkout') }}" 
+                        style="background: #0d6efd; 
+                                color: white; 
+                                padding: 12px 25px; 
+                                border-radius: 6px; 
+                                text-decoration: none;
+                                display: inline-block;">
+                            CHECKOUT
+                        </a>
+                    </div>
+
+                        </div>
                     </div>
                 </div>
             </div>

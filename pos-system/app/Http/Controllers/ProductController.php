@@ -70,6 +70,73 @@ class ProductController extends Controller
         return Redirect::route('dashboard')->with('status', 'Product deleted successfully.');
     }
 
+    public function addToCart(Product $product): RedirectResponse
+{
+    $product = request()->user()->products()->findOrFail($product->id);
+
+    if (!$product->availability) {
+        return Redirect::route('dashboard')
+            ->with('status', 'Product is unavailable.');
+    }
+
+    if ($product->stock < 1) {
+        return Redirect::route('dashboard')
+            ->with('status', 'Product is out of stock.');
+    }
+
+    $cart = session()->get('cart', []);
+
+    if (isset($cart[$product->id])) {
+
+        if ($cart[$product->id]['quantity'] >= $product->stock) {
+            return Redirect::route('dashboard')
+                ->with('status', 'Not enough stock available.');
+        }
+
+        $cart[$product->id]['quantity']++;
+
+    } else {
+
+        $cart[$product->id] = [
+            'id' => $product->id,
+            'name' => $product->name,
+            'sku' => $product->sku,
+            'price' => (float) $product->price,
+            'quantity' => 1,
+            'image' => $product->product_picture,
+        ];
+    }
+
+    session()->put('cart', $cart);
+
+    return Redirect::route('dashboard')
+        ->with('status', $product->name . ' added to cart.');
+}
+public function decreaseCart(Product $product): RedirectResponse
+{
+    $product = request()->user()->products()->findOrFail($product->id);
+
+    $cart = session()->get('cart', []);
+
+    if (!isset($cart[$product->id])) {
+        return Redirect::route('dashboard');
+    }
+
+    if ($cart[$product->id]['quantity'] > 1) {
+
+        $cart[$product->id]['quantity']--;
+
+    } else {
+
+        unset($cart[$product->id]);
+
+    }
+
+    session()->put('cart', $cart);
+
+    return Redirect::route('dashboard');
+}
+
     private function generateSku(Request $request): string
     {
         do {
