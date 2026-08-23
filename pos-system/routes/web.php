@@ -4,8 +4,15 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+<<<<<<< Updated upstream
 Route::get('/', function () {
     return view('welcome');
+=======
+Route::middleware('web')->group(function () {
+    Route::get('/', function () {
+        return redirect()->route('register');
+    });
+>>>>>>> Stashed changes
 });
 
 Route::get('/dashboard', function () {
