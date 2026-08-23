@@ -40,6 +40,9 @@ Route::middleware('auth')->group(function () {
         ->name('profile.destroy');
 
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout');
+
+    Route::get('/checkout', function () {return back();
+});
 });
 
 require __DIR__.'/auth.php';

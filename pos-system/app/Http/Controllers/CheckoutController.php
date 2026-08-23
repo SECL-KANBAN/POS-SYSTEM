@@ -8,7 +8,6 @@ class CheckoutController extends Controller
 {
     public function store(Request $request)
     {
-        // kunin cart (session or DB)
         $cart = session('cart', []);
 
         if (empty($cart)) {
@@ -18,15 +17,14 @@ class CheckoutController extends Controller
         $total = 0;
 
         foreach ($cart as $item) {
-            $total += $item['price'] * $item['qty'];
+            $qty = $item['qty'] ?? 1;
+            $total += $item['price'] * $qty;
         }
-
-        // save order (optional)
-        // Order::create([...]);
-
-        // clear cart
         session()->forget('cart');
 
-        return view('receipt', compact('cart', 'total'));
+        return redirect()->back()->with([
+            'receipt' => $cart,
+            'total' => $total
+        ]);
     }
 }

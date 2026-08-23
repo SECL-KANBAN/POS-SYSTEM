@@ -162,29 +162,49 @@
                     <div class="p-6 text-gray-900 dark:text-gray-100">
                         <h2 class="text-xl font-semibold">{{ __('Cart') }}</h2>
 
-                        <div class="p-6">
-                            <h2 class="text-xl font-semibold">Cart</h2>
-
-                            <!-- Cart Items -->
                             <div id="cart-items">
                                 {{-- loop mo dito yung cart items --}}
                             </div>
 
-                            <!-- Total -->
                             <p class="mt-4 font-bold">
                                 Total: ₱{{ $total ?? 0 }}
                             </p>
 
-                            <!-- Checkout -->
                             <form method="POST" action="{{ route('checkout') }}">
                                 @csrf
                                 <x-primary-button class="mt-4">
                                     Checkout
                                 </x-primary-button>
                             </form>
-                        </div>
                     </div>
                 </div>
+
+                @if(session('receipt'))
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <h3 class="text-lg font-bold">🧾 Receipt</h3>
+
+                    <div class="mt-2 space-y-2">
+                        @foreach(session('receipt') as $item)
+                        <div class="flex justify-between text-sm">
+                            <span>
+                                {{ $item['name'] ?? 'Product' }}
+                                (x{{ $item['qty'] ?? 1 }})
+                            </span>
+
+                            <span>
+                                ₱{{ ($item['price'] ?? 0) * ($item['qty'] ?? 1) }}
+                            </span>
+                        </div>
+                        @endforeach
+                    </div>
+
+                    <hr class="my-2">
+
+                    <p class="font-bold">
+                        Total: ₱{{ session('total') }}
+                    </p>
+                </div>
+                @endif
             </div>
         </div>
     </div>
