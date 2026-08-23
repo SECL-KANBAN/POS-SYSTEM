@@ -27,8 +27,9 @@
                 </header>
             @endisset
 
-
-
+            {{ $slot }}
         </div>
+
+        
     </body>
 </html>
