@@ -7,7 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -16,11 +16,12 @@ class ProductController extends Controller
         $validated = $request->validate([
             'product_picture' => ['nullable', 'image', 'max:2048'],
             'name' => ['required', 'string', 'max:255'],
-            'sku' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'availability' => ['required', 'boolean'],
         ]);
+
+        $validated['sku'] = $this->generateSku($request);
 
         if ($request->hasFile('product_picture')) {
             $validated['product_picture'] = $request->file('product_picture')->store('products', 'public');
@@ -38,14 +39,6 @@ class ProductController extends Controller
         $validated = $request->validate([
             'product_picture' => ['nullable', 'image', 'max:2048'],
             'name' => ['required', 'string', 'max:255'],
-            'sku' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('products', 'sku')
-                    ->where(fn ($query) => $query->where('user_id', $request->user()->id))
-                    ->ignore($product->id),
-            ],
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'availability' => ['required', 'boolean'],
@@ -75,5 +68,14 @@ class ProductController extends Controller
         $product->delete();
 
         return Redirect::route('dashboard')->with('status', 'Product deleted successfully.');
+    }
+
+    private function generateSku(Request $request): string
+    {
+        do {
+            $sku = 'SKU-'.Str::upper(Str::random(8));
+        } while ($request->user()->products()->where('sku', $sku)->exists());
+
+        return $sku;
     }
 }
