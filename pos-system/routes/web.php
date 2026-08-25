@@ -18,6 +18,12 @@ Route::get('/dashboard', function () {
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/transaction-history', function () {
+    return view('transaction-history', [
+        'transactions' => request()->user()->transactions()->latest()->get(),
+    ]);
+})->middleware(['auth', 'verified'])->name('transaction-history');
+
 Route::middleware('auth')->group(function () {
 
     Route::post('/products', [ProductController::class, 'store'])
