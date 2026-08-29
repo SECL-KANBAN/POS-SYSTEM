@@ -20,7 +20,7 @@ Route::get('/dashboard', function () {
 
 Route::get('/transaction-history', function () {
     return view('transaction-history', [
-        'transactions' => request()->user()->transactions()->latest()->get(),
+        //'transactions' => request()->user()->transactions()->latest()->get(),
     ]);
 })->middleware(['auth', 'verified'])->name('transaction-history');
 
