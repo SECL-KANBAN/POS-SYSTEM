@@ -36,6 +36,7 @@
                                         <x-input-error :messages="$errors->get('product_picture')" class="mt-2" />
                                     </div>
 
+
                                     <div>
                                         <x-input-label for="name" :value="__('Name')" />
                                         <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required />
@@ -285,15 +286,16 @@
                                 </p>
 
                             @endif
-                            <div style="margin-top: 20px; text-align: right;">
-                        <a href="{{ route('checkout') }}" 
-                        style="background: #0d6efd; 
-                                color: white; 
-                                padding: 12px 25px; 
+                            <div style="margin-top: 20px; text-align: right; ">
+                            <a id="checkoutBtn" href="{{ route('checkout') }}" 
+                            style="background: #ffffff; 
+                                color: #1F2937; 
+                                padding: 6px 18px; 
                                 border-radius: 6px; 
                                 text-decoration: none;
-                                display: inline-block;">
-                            CHECKOUT
+                                display: inline-block;
+                                font-family: Arial;">
+                            Checkout
                         </a>
                     </div>
 
