@@ -19,7 +19,7 @@
                         <x-primary-button class="mt-4" type="button" x-on:click="showProductForm = !showProductForm">
                             {{ __('Add Product') }}
                         </x-primary-button>
-
+      
                         <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/75 p-4" x-show="showProductForm" x-cloak x-transition.opacity @click.self="showProductForm = false">
                             <div class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800" role="dialog" aria-modal="true" aria-labelledby="add-product-title">
                                 <div class="flex items-center justify-between">
