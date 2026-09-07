@@ -297,7 +297,7 @@
                         @else
 
                         <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">
-                            Your cart is empty.
+                            Your cart is empty!.
                         </p>
 
                         @endif
