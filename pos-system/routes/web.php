@@ -5,8 +5,12 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CheckoutController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+Route::middleware('web')->group(function () {
+
+    Route::get('/', function () {
+        return redirect()->route('register');
+    });
+
 });
 
 Route::get('/dashboard', function () {
@@ -14,6 +18,12 @@ Route::get('/dashboard', function () {
         'products' => request()->user()->products()->latest()->get(),
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/transaction-history', function () {
+    return view('transaction-history', [
+        //'transactions' => request()->user()->transactions()->latest()->get(),
+    ]);
+})->middleware(['auth', 'verified'])->name('transaction-history');
 
 Route::middleware('auth')->group(function () {
 
@@ -41,10 +51,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart/decrease/{product}', [ProductController::class, 'decreaseCart'])
     ->name('cart.decrease');
    
-    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout');
-
-    Route::get('/checkout', function () {return back();
-});
+    Route::get('/checkout', function () {return view('checkout');
+    })->name('checkout');
 });
 
 require __DIR__.'/auth.php';
