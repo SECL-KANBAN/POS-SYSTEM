@@ -50,8 +50,39 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart/decrease/{product}', [ProductController::class, 'decreaseCart'])
     ->name('cart.decrease');
    
-    Route::get('/checkout', function () {return view('checkout');
-    })->name('checkout');
+   Route::get('/checkout', function () {
+    $cart = session()->get('cart', []);
+    $total = 0;
+
+    foreach ($cart as $item) {
+        $total += $item['price'] * $item['quantity'];
+    }
+
+    return view('checkout', [
+        'cart' => $cart,
+        'total' => $total,
+    ]);
+})->name('checkout');
+
+Route::post('/checkout', function (\Illuminate\Http\Request $request) {
+    $cart = session()->get('cart', []);
+    $total = 0;
+
+    foreach ($cart as $item) {
+        $total += $item['price'] * $item['quantity'];
+    }
+
+    $request->validate([
+        'amount_paid' => ['required', 'numeric', 'min:' . $total],
+    ]);
+
+    session()->forget('cart');
+
+    return redirect()->route('dashboard')
+        ->with('status', __('Payment received. Change: ₱:change', [
+            'change' => number_format($request->amount_paid - $total, 2),
+        ]));
+})->name('checkout.store');
 });
 
 require __DIR__.'/auth.php';

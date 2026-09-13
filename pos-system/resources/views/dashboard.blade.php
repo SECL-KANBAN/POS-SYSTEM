@@ -8,6 +8,8 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="flex min-h-[calc(100vh-10rem)] gap-6">
+
+                {{-- ================= PRODUCTS CARD ================= --}}
                 <div class="min-w-0 flex-1 overflow-hidden rounded-lg bg-white shadow-sm dark:bg-gray-800" x-data="{ showProductForm: {{ $errors->any() ? 'true' : 'false' }}, editProduct: null }" @keydown.escape.window="showProductForm = false; editProduct = null">
                     <div class="p-6 text-gray-900 dark:text-gray-100">
                         <h2 class="text-xl font-semibold">{{ __('Products') }}</h2>
@@ -35,7 +37,6 @@
                                         <input id="product_picture" name="product_picture" type="file" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400" />
                                         <x-input-error :messages="$errors->get('product_picture')" class="mt-2" />
                                     </div>
-
 
                                     <div>
                                         <x-input-label for="name" :value="__('Name')" />
@@ -170,138 +171,162 @@
                     </div>
                 </div>
 
-                <div class="min-w-0 flex-1 overflow-hidden rounded-lg bg-white shadow-sm dark:bg-gray-800">
-            <div class="p-6 text-gray-900 dark:text-gray-100">
-
-                <h2 class="text-xl font-semibold">{{ __('Cart') }}</h2>
-
+                {{-- ================= CART CARD ================= --}}
                 @php
                     $cart = session()->get('cart', []);
+                    $total = 0;
+
+                    foreach ($cart as $item) {
+                        $total += $item['price'] * $item['quantity'];
+                    }
                 @endphp
 
-                @if(count($cart) > 0)
+                <div class="min-w-0 flex-1 overflow-hidden rounded-lg bg-white shadow-sm dark:bg-gray-800"
+                     x-data="{ amountPaid: '', total: {{ $total }} }">
+                    <div class="p-6 text-gray-900 dark:text-gray-100">
 
-                    <div class="mt-6 space-y-3">
+                        <h2 class="text-xl font-semibold">{{ __('Cart') }}</h2>
 
-                        @foreach($cart as $item)
+                        @if(count($cart) > 0)
 
-                            <div class="flex items-center gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700">
+                            <div class="mt-6 space-y-3">
 
-                                {{-- Product Image --}}
-                                @if(!empty($item['image']))
-                                    <img
-                                        src="{{ \Illuminate\Support\Facades\Storage::url($item['image']) }}"
-                                        alt="{{ $item['name'] }}"
-                                        class="h-12 w-12 rounded object-cover"
-                                    >
-                                @endif
+                                @foreach($cart as $item)
 
-                                {{-- Product Information --}}
-                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700">
 
-                                    <p class="font-medium">
-                                        {{ $item['name'] }}
-                                    </p>
+                                        {{-- Product Image --}}
+                                        @if(!empty($item['image']))
+                                            <img
+                                                src="{{ \Illuminate\Support\Facades\Storage::url($item['image']) }}"
+                                                alt="{{ $item['name'] }}"
+                                                class="h-12 w-12 rounded object-cover"
+                                            >
+                                        @endif
 
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ $item['sku'] }}
-                            </p>
+                                        {{-- Product Information --}}
+                                        <div class="min-w-0 flex-1">
 
-                            <div class="mt-2 flex items-center gap-2">
+                                            <p class="font-medium">
+                                                {{ $item['name'] }}
+                                            </p>
 
-                            {{-- Minus Button --}}
-                            <form method="POST" action="{{ route('cart.decrease', $item['id']) }}">
-                                @csrf
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                                {{ $item['sku'] }}
+                                            </p>
 
-                                <button
-                                    type="submit"
-                                    class="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-sm font-semibold hover:bg-gray-100"
-                                >
-                                    −
-                                </button>
-                            </form>
+                                            <div class="mt-2 flex items-center gap-2">
 
-                            {{-- Quantity --}}
-                            <span class="min-w-[25px] text-center font-medium">
-                                {{ $item['quantity'] }}
-                            </span>
+                                                {{-- Minus Button --}}
+                                                <form method="POST" action="{{ route('cart.decrease', $item['id']) }}">
+                                                    @csrf
 
-                            {{-- Plus Button --}}
-                            <form method="POST" action="{{ route('cart.add', $item['id']) }}">
-                                @csrf
+                                                    <button
+                                                        type="submit"
+                                                        class="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-sm font-semibold hover:bg-gray-100"
+                                                    >
+                                                        −
+                                                    </button>
+                                                </form>
 
-                                <button
-                                    type="submit"
-                                    class="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-sm font-semibold hover:bg-gray-100"
-                                >
-                                    +
-                                </button>
-                            </form>
+                                                {{-- Quantity --}}
+                                                <span class="min-w-[25px] text-center font-medium">
+                                                    {{ $item['quantity'] }}
+                                                </span>
 
-                        </div>
+                                                {{-- Plus Button --}}
+                                                <form method="POST" action="{{ route('cart.add', $item['id']) }}">
+                                                    @csrf
 
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            ₱{{ number_format($item['price'], 2) }} each
-                        </p>
+                                                    <button
+                                                        type="submit"
+                                                        class="flex h-7 w-7 items-center justify-center rounded-md border border-gray-300 text-sm font-semibold hover:bg-gray-100"
+                                                    >
+                                                        +
+                                                    </button>
+                                                </form>
 
-                        </div>
+                                            </div>
 
-                        {{-- Item Total --}}
-                        <div class="font-semibold">
-                            ₱{{ number_format($item['price'] * $item['quantity'], 2) }}
-                        </div>
+                                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                                ₱{{ number_format($item['price'], 2) }} each
+                                            </p>
 
-                    </div>
+                                        </div>
 
-                @endforeach
-
-                                </div>
-
-                                @php
-                                    $total = 0;
-
-                                    foreach($cart as $item) {
-                                        $total += $item['price'] * $item['quantity'];
-                                    }
-                                @endphp
-
-                                <div class="mt-6 border-t border-gray-200 pt-4 dark:border-gray-700">
-
-                                    <div class="flex justify-between text-lg font-semibold">
-
-                                        <span>Total</span>
-
-                                        <span>
-                                            ₱{{ number_format($total, 2) }}
-                                        </span>
+                                        {{-- Item Total --}}
+                                        <div class="font-semibold">
+                                            ₱{{ number_format($item['price'] * $item['quantity'], 2) }}
+                                        </div>
 
                                     </div>
 
+                                @endforeach
+
+                            </div>
+
+                            <div class="mt-6 border-t border-gray-200 pt-4 dark:border-gray-700">
+
+                                <div class="flex justify-between text-lg font-semibold">
+                                    <span>Total</span>
+                                    <span>₱{{ number_format($total, 2) }}</span>
                                 </div>
 
-                            @else
+                            </div>
 
-                                <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">
-                                    Your cart is empty.
-                                </p>
+                            {{-- Cash Payment / Change Calculator --}}
+                            <div class="mt-4 border-t border-gray-200 pt-4 dark:border-gray-700">
+                                <label for="amount_paid" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    {{ __('Amount Paid') }}
+                                </label>
+                                <input
+                                    id="amount_paid"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    x-model.number="amountPaid"
+                                    placeholder="0.00"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                />
 
-                            @endif
-                            <div style="margin-top: 20px; text-align: right; ">
-                            <a id="checkoutBtn" href="{{ route('checkout') }}" 
-                            style="background: #ffffff; 
-                                color: #1F2937; 
-                                padding: 6px 18px; 
-                                border-radius: 6px; 
-                                text-decoration: none;
-                                display: inline-block;
-                                font-family: Arial;">
-                            Checkout
-                        </a>
-                    </div>
+                                <div class="mt-3 flex justify-between text-base font-semibold">
+                                    <span>{{ __('Change') }}</span>
+                                    <template x-if="amountPaid === '' || amountPaid === null">
+                                        <span class="text-gray-400">₱0.00</span>
+                                    </template>
+                                    <template x-if="amountPaid !== '' && amountPaid !== null && (amountPaid - total) >= 0">
+                                        <span class="text-green-600 dark:text-green-400" x-text="'₱' + (amountPaid - total).toFixed(2)"></span>
+                                    </template>
+                                    <template x-if="amountPaid !== '' && amountPaid !== null && (amountPaid - total) < 0">
+                                        <span class="text-red-600 dark:text-red-400">{{ __('Insufficient amount') }}</span>
+                                    </template>
+                                </div>
+                            </div>
 
+                        @else
+
+                            <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">
+                                Your cart is empty.
+                            </p>
+
+                        @endif
+
+                        <div style="margin-top: 20px; text-align: right;">
+                            <a id="checkoutBtn" href="{{ route('checkout') }}"
+                               style="background: #ffffff;
+                                   color: #1F2937;
+                                   padding: 6px 18px;
+                                   border-radius: 6px;
+                                   text-decoration: none;
+                                   display: inline-block;
+                                   font-family: Arial;">
+                                Checkout
+                            </a>
                         </div>
+
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
